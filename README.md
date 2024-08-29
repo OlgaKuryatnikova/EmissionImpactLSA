@@ -7,4 +7,4 @@ There are 3 different codes:
 
 - Optimisation_sp : It performs the optimisation of social welfare of the energy market
 - Graph: uses the results from the code optimisation to create results and graphs from the paper.
-- 
+  
