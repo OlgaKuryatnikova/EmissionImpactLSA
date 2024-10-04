@@ -17,7 +17,7 @@ import numpy as np
 
 path_file_source= "path\\source\\"
 # the folder source is in the same github package
-path_file_optimisation = "path_to_save_optimziation_output"
+path_file_optimisation = "path_to_save_optimisation_output"
 
 class Object(object):
     pass
