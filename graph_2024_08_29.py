@@ -13,8 +13,9 @@ get_ipython().magic('reset -sf')
 #Change the source
 path_file_source= "path\\source\\"
 # the folder source is in the same github package
-path_file_optimisation = "path to save results"
-path_file_result = "path to save results"
+path_file_optimisation = "path_to_save_optimisation_output"
+# "path_to_save_optimisation_output" is created in the file Optimisation_sp - 2024_08_29.py
+path_file_result = "path_to_save_plot_results"
 
 #load required package
 import numpy as np
