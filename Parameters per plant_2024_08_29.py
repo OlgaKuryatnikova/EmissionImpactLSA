@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Oct 13 15:54:55 2022
-
-@author: 78160cdu
 """
 import pandas as pd
-path_file_source= "C:\\Users\\78160cdu\Dropbox (Erasmus Universiteit Rotterdam)\\EnergyMarket\\Data\\source\\"
 # path_file_source= "path\\source\\"
 # the folder source is in the same github package
 
@@ -136,8 +133,7 @@ for i in list(set(final_df2['type_g'])):
 final_df3['marginal_cost_2019']= final_df3['operating_cost_2019'] +final_df3['emission_cost_2019'] 
 final_df3['marginal_cost_2022']= final_df3['operating_cost_2022'] +final_df3['emission_cost_2022'] 
 
-#Waste is considered as Baseload like renewable, I find it by taking the max usage in 2019 (Maybe mean would make more sense ?)
+#Waste is considered as Baseload like renewable, I find it by taking the max usage in 2019
 
-final_df3.to_csv("C:\\Users\\78160cdu\\OneDrive - Erasmus University Rotterdam\Documents\\Research\\Project 1\\Data\\Parameters_plants_NL.csv")
 # final_df3.to_csv("path to file\\file.csv")
 
