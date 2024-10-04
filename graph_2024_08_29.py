@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on 29/08/2024
-@author: Clarisse Dupont
 Code to create the graph of the paper
 
 """
@@ -12,9 +11,10 @@ from IPython import get_ipython
 get_ipython().magic('reset -sf')
 
 #Change the source
-path_file_source= "C:\\Users\\78160cdu\Dropbox (Erasmus Universiteit Rotterdam)\\EnergyMarket\\Data\\source\\"
-path_file_optimisation = "C:\\Users\\78160cdu\Dropbox (Erasmus Universiteit Rotterdam)\\EnergyMarket\\Data\\tax\\"
-path_file_result = "C:\\Users\\78160cdu\Dropbox (Erasmus Universiteit Rotterdam)\\EnergyMarket\\Data\\result\\"
+path_file_source= "path\\source\\"
+# the folder source is in the same github package
+path_file_optimisation = "path to save results"
+path_file_result = "path to save results"
 
 #load required package
 import numpy as np
