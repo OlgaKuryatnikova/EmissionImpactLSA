@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 2022
-@author: 77020oku
-
 A model for the behavior of a day-ahead market: social planner
 """
 
@@ -17,8 +15,9 @@ import picos
 import numpy as np
 
 
-path_file_source= "C:\\Users\\78160cdu\Dropbox (Erasmus Universiteit Rotterdam)\\EnergyMarket\\Data\\source\\"
-path_file_optimisation = "C:\\Users\\78160cdu\Dropbox (Erasmus Universiteit Rotterdam)\\EnergyMarket\\Data\\tax\\"
+path_file_source= "path\\source\\"
+# the folder source is in the same github package
+path_file_optimisation = "path to save output"
 
 class Object(object):
     pass
@@ -54,12 +53,8 @@ for i in ind_nan:
         Q_r_full["Solar MWH"][i-1] + Q_r_full["Solar MWH"][i+1])/2
     D_full[i] = (D_full[i-1] + D_full[i+1])/2
 
-
 par_temp_ori = pd.read_csv(f"{path_file_source}Parameters_plants_NL_2.csv", sep=';', usecols=[1,7,8,10,12])
 Prices = pd.read_csv(f"{path_file_source}Prices.csv", sep=',', index_col=0)
-
-
-
 
 '''Set up main prameters'''
 # All further parameters are given per LSA type, there are 10 LSA types  in the order as below
@@ -94,8 +89,6 @@ mult_w = 1 #multiplier of the wind generation
 co2_tax = 3.8 #what co2 tax to use, for transaction tax, A1 is alpha 1, can also be set to 'ETS' or to any number
 Pollution_rate = 0 #what is the maximum pollution rate desired to apply the co2 tax alpha 1
 
-
-
 def optimisation_sp(lsa,  year=2019, mult_lsa=1, num_days=365, LSA_Capacity='dynamic',
                      start_day=0, co2_tax='ETS', mult_d = 1, mult_s = 1.0, mult_w = 1.0, Pollution_rate = 0):
 
@@ -128,8 +121,6 @@ def optimisation_sp(lsa,  year=2019, mult_lsa=1, num_days=365, LSA_Capacity='dyn
         par.S_min = 0.1*Capacity  # min SOC
         par.S_init = par.S_max/2
 
-
-
     for obs in range(start_day + add_days, start_day + num_days + add_days):
         value = Object() #that are the parameters that are changing daily
         day_year = obs - add_days
@@ -146,7 +137,6 @@ def optimisation_sp(lsa,  year=2019, mult_lsa=1, num_days=365, LSA_Capacity='dyn
         par_temp['operating cost'] = par_temp['operating cost'] + \
             par_temp['O & M cost']
 
-        
         if co2_tax == 'ETS':
             co2_tax_value = Prices.loc[obs, co2_tax]/1000
         else:
@@ -179,7 +169,6 @@ def optimisation_sp(lsa,  year=2019, mult_lsa=1, num_days=365, LSA_Capacity='dyn
         value.c_f = np.matrix(par_temp[:, -1])
         value.c_f = np.tile(value.c_f, (par.T, 1))
         value.price = np.concatenate((par.pmin*np.ones((par.T, 1)), value.c_f), 1)
-        
 
         ind_t = range(24*obs, 24*obs + par.T)  # range of hours
         D = D_full[ind_t]*mult_d
@@ -196,13 +185,11 @@ def optimisation_sp(lsa,  year=2019, mult_lsa=1, num_days=365, LSA_Capacity='dyn
         q_f = RealVariable("q_f", (par.T, par.n_f), lower=0,
                            upper=value.quant[range(par.T), 1:])
 
-      
         s = RealVariable("s", (par.T+1), lower=par.S_min,
                          upper=par.S_max)  # state of charge variables
         # contracts can start in all but the last periods
         q_b = RealVariable("q_b", (par.T), lower=0, upper=Capacity*dc_rate)
         w_b = RealVariable("w_b", (par.T), lower=0, upper=Capacity*dc_rate)
-
 
         '''Add objective and constraints'''
         # Objective
@@ -241,7 +228,7 @@ def optimisation_sp(lsa,  year=2019, mult_lsa=1, num_days=365, LSA_Capacity='dyn
                                       # for t in range(par.T) ]
 
         '''Solve'''
-        P.solve(solver='mosek')
+        P.solve(solver='mosek') # any other LP solver could be used
 
         '''Extract optimization results'''
         sol_sp = Object()
