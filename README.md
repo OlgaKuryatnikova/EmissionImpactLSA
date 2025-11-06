@@ -1,10 +1,18 @@
 # EmissionImpactLSA
 Python code for Unintended Carbon Impacts of Electricity Storage and Demand Management
-
 There are 3 different codes:
+⦁	Parameters per plant: It gives the modification done from the original database of Dutch generation facilities that is used in our optimization, the output of this code is the file 'Parameters_plants_2019.csv' and 'Parameters_plants_2022.csv' which is already uploaded in the folder source
+⦁	Optimisation_sp : It contains a function to optimize the social welfare of a certain market situation, we use the mosek solver
+⦁	Graph: uses the results from the code optimization to create results and graphs from the paper.
 
-- Parameters per plant: It gives the modification done from the original database of Dutch generation facilities that is used in our optimization, the output of this code is the file 'Parameters_plants_NL_v2.csv' which is already uploaded in the folder source
+The folder should be organize as follow in your userpath,
 
-- Optimisation_sp : It performs the optimization of the social welfare of the energy market
-- Graph: uses the results from the code optimization to create results and graphs from the paper.
+Data :
+ 	- result (some results are store from the graph file)
+ 	- result_optimisation : (all files from here come from running the function optimisation_sp)
+ 				-All
+ 				-constraint:
+ 						-ramp
+ 				-new_file
+ 	- source (file given)
   
