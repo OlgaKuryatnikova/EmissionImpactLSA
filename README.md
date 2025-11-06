@@ -8,11 +8,12 @@ There are 3 different codes:
 The folder should be organize as follow in your userpath,
 
 Data :
-* result (some results are store from the graph file)
-* result_optimisation : (all files from here come from running the function optimisation_sp)
+* source (folder is given in the repository)
+* result (some results will be stored from the graph file)
+* result_optimisation : (all files from running the function optimisation_sp are stored here)
     * All
     * new_file
     * constraint:
       * ramp
- * source (file given)
+
   
