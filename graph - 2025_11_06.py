@@ -21,6 +21,7 @@ path_file_result = os.path.join(userpath,"Data\\result\\")
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import intertools
 import pickle
 from PIL import Image
 class Object(object):
@@ -751,10 +752,96 @@ plt.ylabel("Storage annual volume of sell (Gwh)")
 # Show the plot
 plt.show()
 
-#what about the data you mentionned there, how did you get there
+# ==========================================================
+# Figure 6 : Average residual demand profile
+# =============================================================================
+
+import itertools
+
+def Residual_demand(sol_sp):
+    if hasattr(sol_sp[0], 'D'):
+        demand = list(itertools.chain.from_iterable(sol_sp[kk].D for kk in range(len(sol_sp))))
+        renewable = list(itertools.chain.from_iterable(np.ravel(sol_sp[kk].var.q_f[:, 0]) for kk in range(len(sol_sp))))
+        dr = [x - y for x, y in zip(demand, renewable)]
+    else:
+        dr = list(itertools.chain.from_iterable(sol_sp[kk].D_r for kk in range(len(sol_sp))))
+    return dr
+
+Residual_demand_solar = {}
+Representative_week_solar  = {}
+
+
+Residual_demand_wind = {}
+Representative_week_wind = {}
+
+for year in [2019,2022]:
+    Residual_demand_solar[year] = pd.DataFrame()
+    Residual_demand_wind[year] = pd.DataFrame()
+    for res in RES_value[year]:
+        Residual_demand_solar[year][res] = Residual_demand(sol_solar[year][res])
+        Residual_demand_solar[year][res] = Residual_demand_solar[year][res].apply(lambda x: x[0])
+        Residual_demand_wind[year][res] = Residual_demand(sol_wind[year][res])
+        Residual_demand_wind[year][res] = Residual_demand_wind[year][res].apply(lambda x: x[0])
+    if year == 2019:
+        date_range = pd.date_range(start="2019-01-01", periods=8760, freq="H")
+    else:
+        date_range = pd.date_range(start="2022-01-01", periods=8760, freq="H")
+    Residual_demand_solar[year].set_index(date_range, inplace = True)
+    Residual_demand_solar[year]["hour_of_week"] = (Residual_demand_solar[year].index.dayofweek * 24) + Residual_demand_solar[year].index.hour  # 0-167
+    Residual_demand_solar[year]["hour_of_day"] = Residual_demand_solar[year].index.hour  # 0-23
+    Residual_demand_solar[year]["day_of_week"] = Residual_demand_solar[year].index.dayofweek  # 0=Monday, ..., 6=Sunday
+    Representative_week_solar[year] = Residual_demand_solar[year].groupby("hour_of_week").mean()
+    
+    Residual_demand_wind[year].set_index(date_range, inplace = True)
+    Residual_demand_wind[year]["hour_of_week"] = (Residual_demand_wind[year].index.dayofweek * 24) + Residual_demand_wind[year].index.hour  # 0-167
+    Residual_demand_wind[year]["hour_of_day"] = Residual_demand_wind[year].index.hour  # 0-23
+    Residual_demand_wind[year]["day_of_week"] = Residual_demand_wind[year].index.dayofweek  # 0=Monday, ..., 6=Sunday
+    Representative_week_wind[year] = Residual_demand_wind[year].groupby("hour_of_week").mean()
+   
+    # Compute representative weekly profile
+    Representative_week_solar[year] = Residual_demand_solar[year].groupby("hour_of_day").mean()
+    Representative_week_wind[year] = Residual_demand_wind[year].groupby("hour_of_day").mean()
+    Representative_week_wind[year].drop(['day_of_week'], inplace = True, axis = 1)
+    Representative_week_solar[year].drop(['day_of_week'], inplace = True, axis = 1)
+
+    Representative_week_wind[year] = (
+        Residual_demand_wind[year][Residual_demand_wind[year]["day_of_week"] < 8]
+        .groupby("hour_of_day")
+        .mean()
+    )
+
+
+plt.figure()
+Representative_week_solar[2019][1.0].plot(label="Baseline", linewidth=2, color = "black")
+Representative_week_solar[2019][5.0].plot(label="Solar ×5", linewidth=2, linestyle ='dotted', color = "black")
+Representative_week_wind[2019][5.0].plot(label="Wind ×5", linewidth=2, linestyle="--", color = "black")
+plt.xlabel("Hour of day")
+plt.ylabel("Residual Demand (Gwh)")
+plt.legend()
+plt.ylim(0,11)
+#plt.tight_layout()
+plt.show()
+
+
+
+
+
+plt.figure()
+Representative_week_solar[2022][1.0].plot(label="Baseline", linewidth=2, color = "black")
+Representative_week_solar[2022][5.0].plot(label="Solar ×5", linewidth=2, color = "black", linestyle = "dotted")
+Representative_week_wind[2022][5.0].plot(label="Wind ×5", linewidth=2, linestyle="--", color = "black")
+plt.xlabel("Hour of day")
+plt.ylabel("Residual Demand (Gwh)")
+plt.legend()
+plt.ylim(0,11)
+#plt.tight_layout()
+plt.show()
+
+
+
 
  # ==========================================================
-# Figure 6 : Impact RES generation capacityon the volume of different transaction types
+# Figure 7 : Impact RES generation capacityon the volume of different transaction types
 # =============================================================================
 couple_wind={}
 couple_solar={}
@@ -871,7 +958,7 @@ graph_transaction(count_solar[2022])
 
 
 # ==========================================================
-#Figure 7 : Transaction-wise and yearly rates of added emission
+#Figure 8 : Transaction-wise and yearly rates of added emission
 # =============================================================================
 tax_boxplot = {}
 tax_boxplot[2019] = [0, 20,40,60, 100,600]
@@ -1082,7 +1169,7 @@ for lsa in range(5):
 
 
 # ==========================================================
-#Figure 8 : Minimal carbon levy for different maximal allowed rates of added emission
+#Figure 9 : Minimal carbon levy for different maximal allowed rates of added emission
 # =============================================================================
 
 #compute the theoretical tax
@@ -1254,7 +1341,7 @@ for q in [90,100]:
             
             
  # ==========================================================
-# Figure 9 : LSA changes of profit compared to the case without any carbon levy, dependence on 'result_sp_tax_period' from figure 7
+# Figure 10 : LSA changes of profit compared to the case without any carbon levy, dependence on 'result_sp_tax_period' from figure 7
 # =============================================================================
 
 change = {}
@@ -1299,7 +1386,7 @@ plt.legend()
 plt.show()
 
 # ==========================================================
-#Figure 10: annual CO2 emission impact with ramping
+#Figure 11: annual CO2 emission impact with ramping
 # =============================================================================
 path_file_optimisation = path_file_optimisation = os.path.join(userpath,"Data\\result_optimisation\\constraint\\Ramp\\")
 
@@ -1382,7 +1469,7 @@ for year in [2019,2022]:
      
    
 # ==========================================================
-#Figure 11: change generation with ramping constraints
+#Figure 12: change generation with ramping constraints
 # =============================================================================
 
 #Numbers impact without LSA can be also found in this table:
